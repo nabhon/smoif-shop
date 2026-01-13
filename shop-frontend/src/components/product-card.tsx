@@ -13,9 +13,9 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="aspect-w-1 aspect-h-1 w-full bg-gray-200">
         {/* Placeholder for image */}
         <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-400">
-          {product.image_url ? (
+          {product.imageUrl ? (
             <img
-              src={product.image_url}
+              src={product.imageUrl}
               alt={product.name}
               className="w-full h-full object-cover"
             />
@@ -27,7 +27,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="p-4">
         <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
         <p className="mt-1 text-indigo-600 font-bold">
-          Starts at ฿{product.base_price}
+          Starts at ฿{product.basePrice}
         </p>
         <div className="mt-4">
           <Link href={`/products/${product.id}`} className="w-full">

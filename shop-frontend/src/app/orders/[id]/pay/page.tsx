@@ -105,7 +105,7 @@ export default function PaymentPage({
         </h1>
         <p className="text-gray-500">Total Amount</p>
         <p className="text-4xl font-bold text-indigo-600 mt-2">
-          ฿{order.total_amount}
+          ฿{order.totalAmount}
         </p>
       </div>
 
@@ -117,9 +117,9 @@ export default function PaymentPage({
           </h2>
           <div className="space-y-4">
             <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-              {config.qr_image_url ? (
+              {config.qrImageUrl ? (
                 <img
-                  src={config.qr_image_url}
+                  src={config.qrImageUrl}
                   alt="QR Code"
                   className="w-full h-full object-contain"
                 />
@@ -129,16 +129,16 @@ export default function PaymentPage({
             </div>
             <div>
               <p className="text-sm text-gray-500">Bank</p>
-              <p className="font-semibold">{config.bank_name}</p>
+              <p className="font-semibold">{config.bankName}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Account Name</p>
-              <p className="font-semibold">{config.account_name}</p>
+              <p className="font-semibold">{config.accountName}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Account Number</p>
               <p className="font-mono text-lg font-bold tracking-wider">
-                {config.account_number}
+                {config.accountNumber}
               </p>
             </div>
           </div>
