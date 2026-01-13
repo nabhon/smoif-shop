@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, use } from "react";
 import { fetchClient } from "@/lib/api";
-import { Product, ProductVariant } from "@/types";
+import { Product, ProductResponse, ProductVariant } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/cart-context";
 import { useRouter } from "next/navigation";
@@ -14,7 +14,7 @@ export default function ProductDetailPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const { addToCart } = useCart();
+  const { addToCart, itemCount } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,23 +31,32 @@ export default function ProductDetailPage({
   useEffect(() => {
     async function loadProduct() {
       try {
-        const data = await fetchClient<Product>(`/products/${id}`);
-        setProduct(data);
+        const rawData = await fetchClient<ProductResponse>(`/products/${id}`);
+
+        // Transform backend response to domain model
+        const transformedProduct: Product = {
+          ...rawData,
+          basePrice: parseFloat(rawData.basePrice),
+          variants: rawData.variants?.map((v) => ({
+            ...v,
+            price: parseFloat(v.price),
+            combinationJson:
+              typeof v.combinationJson === "string"
+                ? JSON.parse(v.combinationJson)
+                : v.combinationJson,
+          })),
+        };
+
+        setProduct(transformedProduct);
 
         // Initialize options if variants exist
-        if (data.variants && data.variants.length > 0) {
+        if (
+          transformedProduct.variants &&
+          transformedProduct.variants.length > 0
+        ) {
           // Extract all possible option keys (e.g., Color, Size)
-          // This logic assumes all variants have the same keys, which is typical
-          const firstVariant = data.variants[0];
-          const keys = Object.keys(firstVariant.combination_json || {});
-          /* 
-                For a smoother UX, we could pre-select the first variant's options.
-                const initialOptions: Record<string, string> = {};
-                keys.forEach(key => {
-                    initialOptions[key] = firstVariant.combination_json[key];
-                });
-                setSelectedOptions(initialOptions);
-             */
+          const firstVariant = transformedProduct.variants[0];
+          const keys = Object.keys(firstVariant.combinationJson || {});
         }
       } catch (err) {
         console.error("Failed to load product", err);
@@ -66,7 +75,7 @@ export default function ProductDetailPage({
     if (!product || !product.variants) return;
 
     const match = product.variants.find((v) => {
-      const vOptions = v.combination_json;
+      const vOptions = v.combinationJson;
       // Check if every selected option matches this variant's option
       // And also ensure the variant has the same number of keys (exact match)
       return (
@@ -91,11 +100,11 @@ export default function ProductDetailPage({
       productId: product.id,
       variantId: selectedVariant.id,
       name: product.name,
-      options: selectedVariant.combination_json,
+      options: selectedVariant.combinationJson,
       price: selectedVariant.price,
       amount: 1,
-      maxStock: selectedVariant.stock_quantity,
-      image: product.image_url,
+      maxStock: selectedVariant.stockQuantity,
+      image: product.imageUrl,
     });
 
     // Optional: Show feedback or redirect
@@ -114,21 +123,21 @@ export default function ProductDetailPage({
   // e.g., Color: [Red, Blue], Size: [S, M]
   const optionKeys =
     product.variants && product.variants.length > 0
-      ? Object.keys(product.variants[0].combination_json)
+      ? Object.keys(product.variants[0].combinationJson)
       : [];
 
   // Helper to get available values for a specific option key
   const getValuesForKey = (key: string) => {
     const allValues =
-      product.variants?.map((v) => v.combination_json[key]) || [];
+      product.variants?.map((v) => v.combinationJson[key]) || [];
     return Array.from(new Set(allValues));
   };
 
   const currentPrice = selectedVariant
     ? selectedVariant.price
-    : product.base_price;
+    : product.basePrice;
   const isOutOfStock = selectedVariant
-    ? selectedVariant.stock_quantity <= 0
+    ? selectedVariant.stockQuantity <= 0
     : false;
   const isSelectionComplete =
     product.variants && product.variants.length > 0
@@ -140,9 +149,9 @@ export default function ProductDetailPage({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Image Section */}
         <div className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center text-gray-400 text-6xl">
-          {product.image_url ? (
+          {product.imageUrl ? (
             <img
-              src={product.image_url}
+              src={product.imageUrl}
               alt={product.name}
               className="w-full h-full object-cover rounded-lg"
             />
@@ -193,7 +202,7 @@ export default function ProductDetailPage({
               <p className={isOutOfStock ? "text-red-600" : "text-green-600"}>
                 {isOutOfStock
                   ? "Out of Stock"
-                  : `In Stock: ${selectedVariant.stock_quantity}`}
+                  : `In Stock: ${selectedVariant.stockQuantity}`}
               </p>
             ) : (
               optionKeys.length > 0 && (
