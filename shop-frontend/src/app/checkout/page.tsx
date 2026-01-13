@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "@/context/cart-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { fetchClient } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
-  const { items, cartTotal, clearCart } = useCart();
+  const { items, cartTotal, clearCart, isLoaded } = useCart();
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -20,10 +20,11 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (items.length === 0) {
-    router.push("/");
-    return null;
-  }
+  useEffect(() => {
+    if (isLoaded && items.length === 0) {
+      router.push("/");
+    }
+  }, [items, isLoaded, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,13 +34,13 @@ export default function CheckoutPage() {
     try {
       // Prepare payload
       const orderData = {
-        guest_name: form.guest_name,
-        guest_email: form.guest_email,
+        guestName: form.guest_name,
+        guestEmail: form.guest_email,
         items: items.map((item) => ({
-          product_id: item.productId,
-          variant_id: item.variantId,
+          productId: item.productId,
+          variantId: item.variantId,
           quantity: item.amount,
-          price_at_purchase: item.price,
+          priceAtPurchase: item.price,
         })),
       };
 
