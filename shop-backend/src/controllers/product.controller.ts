@@ -8,11 +8,15 @@ export const getPublicProducts = async (
 ): Promise<void> => {
   try {
     const products = await prisma.product.findMany({
-      where: { isActive: true },
+      where: {
+        status: { in: ["SALE", "PREORDER"] },
+      },
       select: {
         id: true,
         name: true,
         basePrice: true,
+        productImageUrl: true,
+        status: true,
       },
     });
     res.json(products);
@@ -66,13 +70,22 @@ export const createProduct = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { name, basePrice, isActive, variants } = req.body;
+    const {
+      name,
+      basePrice,
+      status,
+      variants,
+      productImageUrl,
+      productImageKey,
+    } = req.body;
 
     const product = await prisma.product.create({
       data: {
         name,
         basePrice,
-        isActive: isActive ?? true,
+        status: status ?? "SALE",
+        productImageUrl,
+        productImageKey,
         variants: {
           create: variants
             ? variants.map((v: any) => ({
@@ -101,14 +114,23 @@ export const updateProduct = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name, basePrice, isActive, variants } = req.body;
+    const {
+      name,
+      basePrice,
+      status,
+      variants,
+      productImageUrl,
+      productImageKey,
+    } = req.body;
 
     const product = await prisma.product.update({
       where: { id: Number(id) },
       data: {
         name,
         basePrice,
-        isActive,
+        status,
+        productImageUrl,
+        productImageKey,
       },
     });
 

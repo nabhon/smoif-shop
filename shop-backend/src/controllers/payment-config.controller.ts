@@ -22,8 +22,14 @@ export const updatePaymentConfig = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { bankName, accountName, accountNumber, qrImageUrl, isActive } =
-      req.body;
+    const {
+      bankName,
+      accountName,
+      accountNumber,
+      qrImageUrl,
+      qrImageKey,
+      isActive,
+    } = req.body;
 
     // Check if config exists, if not create, else update first one found (assuming single config logic for simplicity)
     const existing = await prisma.paymentConfig.findFirst();
@@ -36,6 +42,7 @@ export const updatePaymentConfig = async (
           accountName,
           accountNumber,
           qrImageUrl,
+          qrImageKey,
           isActive: isActive ?? true,
         },
       });
@@ -47,6 +54,7 @@ export const updatePaymentConfig = async (
           accountName,
           accountNumber,
           qrImageUrl,
+          qrImageKey,
           isActive: isActive ?? true,
         },
       });

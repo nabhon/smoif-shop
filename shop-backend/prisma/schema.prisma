@@ -21,6 +21,7 @@ model PaymentConfig {
   accountName   String  @map("account_name")
   accountNumber String  @map("account_number")
   qrImageUrl    String? @map("qr_image_url")
+  qrImageKey    String? @map("qr_image_key")
   isActive      Boolean @default(true) @map("is_active")
 
   @@map("payment_configs")
@@ -29,8 +30,10 @@ model PaymentConfig {
 model Product {
   id        Int              @id @default(autoincrement())
   name      String
-  basePrice Decimal          @map("base_price")
-  isActive  Boolean          @default(true) @map("is_active")
+  basePrice       Decimal          @map("base_price")
+  productImageUrl String?          @map("product_image_url")
+  productImageKey String?          @map("product_image_key")
+  status          String           @default("SALE") // Enum: SALE, PREORDER, INACTIVE
   variants  ProductVariant[]
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -53,11 +56,13 @@ model ProductVariant {
 model Order {
   id                 Int       @id @default(autoincrement())
   guestName          String    @map("guest_name")
+  guestSurname       String    @map("guest_surname")
   guestEmail         String    @map("guest_email")
-  guestAddress       String?   @map("guest_address") // Added address as it was missing in the ER but implied in flow
+  // guestAddress removed
   totalAmount        Decimal   @map("total_amount")
   status             String    @default("WAITING_FOR_PAYMENT")
   slipImageUrl       String?   @map("slip_image_url")
+  slipImageKey       String?   @map("slip_image_key")
   paidAt             DateTime? @map("paid_at")
   orderItemsSnapshot String    @map("order_items_snapshot") // JSON string of snapshot
 

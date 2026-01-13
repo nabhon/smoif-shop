@@ -29,6 +29,7 @@ async function main() {
     {
       name: "Classic T-Shirt",
       basePrice: 299,
+      status: "PREORDER",
       variants: [
         {
           price: 299,
@@ -50,6 +51,7 @@ async function main() {
     {
       name: "Cool Cap",
       basePrice: 150,
+      status: "SALE",
       variants: [
         {
           price: 150,
@@ -66,6 +68,7 @@ async function main() {
     {
       name: "Ceramic Mug",
       basePrice: 120,
+      status: "SALE",
       variants: [
         {
           price: 120,
@@ -81,6 +84,7 @@ async function main() {
       data: {
         name: p.name,
         basePrice: p.basePrice,
+        status: p.status,
         variants: {
           create: p.variants,
         },

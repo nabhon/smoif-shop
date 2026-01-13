@@ -9,7 +9,7 @@ export const createOrder = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { guestName, guestEmail, guestAddress, cartItems } = req.body;
+    const { guestName, guestSurname, guestEmail, cartItems } = req.body;
 
     // Calculate total from DB to prevent frontend manipulation
     // NOTE: This assumes cartItems contains { productId, variantId, amount }
@@ -38,8 +38,8 @@ export const createOrder = async (
     const order = await prisma.order.create({
       data: {
         guestName,
+        guestSurname,
         guestEmail,
-        guestAddress,
         totalAmount: total,
         status: "WAITING_FOR_PAYMENT",
         orderItemsSnapshot: JSON.stringify(itemsSnapshot),
