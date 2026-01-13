@@ -6,6 +6,7 @@ import { Product, ProductResponse, ProductVariant } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/cart-context";
 import { useRouter } from "next/navigation";
+import { Minus, Plus } from "lucide-react";
 
 export default function ProductDetailPage({
   params,
@@ -27,6 +28,7 @@ export default function ProductDetailPage({
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
     null
   );
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     async function loadProduct() {
@@ -102,7 +104,7 @@ export default function ProductDetailPage({
       name: product.name,
       options: selectedVariant.combinationJson,
       price: selectedVariant.price,
-      amount: 1,
+      amount: quantity,
       maxStock: selectedVariant.stockQuantity,
       image: product.imageUrl,
     });
@@ -211,6 +213,32 @@ export default function ProductDetailPage({
                 </p>
               )
             )}
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center border rounded-md">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="p-2 hover:bg-gray-100 disabled:opacity-50"
+                disabled={quantity <= 1}
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <div className="px-4 py-2 font-medium">{quantity}</div>
+              <button
+                onClick={() =>
+                  setQuantity(
+                    Math.min(selectedVariant?.stockQuantity || 99, quantity + 1)
+                  )
+                }
+                className="p-2 hover:bg-gray-100 disabled:opacity-50"
+                disabled={
+                  !selectedVariant || quantity >= selectedVariant.stockQuantity
+                }
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           <Button
