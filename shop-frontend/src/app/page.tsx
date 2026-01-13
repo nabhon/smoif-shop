@@ -14,7 +14,7 @@ export default function Home() {
     async function loadProducts() {
       try {
         // Fetch active products
-        const data = await fetchClient<Product[]>("/products?active=true");
+        const data = await fetchClient<Product[]>("/products");
         setProducts(data);
       } catch (err) {
         console.error("Failed to load products", err);
