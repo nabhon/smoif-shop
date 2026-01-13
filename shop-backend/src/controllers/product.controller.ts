@@ -9,9 +9,36 @@ export const getPublicProducts = async (
   try {
     const products = await prisma.product.findMany({
       where: { isActive: true },
-      include: { variants: true },
+      select: {
+        id: true,
+        name: true,
+        basePrice: true,
+      },
     });
     res.json(products);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getProductById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const product = await prisma.product.findUnique({
+      where: { id: Number(id) },
+      include: { variants: true },
+    });
+
+    if (!product) {
+      res.status(404).json({ message: "Product not found" });
+      return;
+    }
+
+    res.json(product);
   } catch (error) {
     next(error);
   }
